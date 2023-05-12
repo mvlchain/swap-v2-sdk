@@ -1,6 +1,7 @@
 import { Token, Currency, CurrencyAmount, Percent, TradeType, validateAndParseAddress } from '@uniswap/sdk-core'
-import { Trade } from './entities'
 import invariant from 'tiny-invariant'
+
+import { Trade } from './entities'
 
 /**
  * Options for producing the arguments to send call to the router.
@@ -67,6 +68,7 @@ export abstract class Router {
    * Cannot be constructed.
    */
   private constructor() {}
+
   /**
    * Produces the on-chain method name to call and the hex encoded parameters to pass as arguments for a given trade.
    * @param trade to produce call parameters for
@@ -140,7 +142,7 @@ export abstract class Router {
     return {
       methodName,
       args,
-      value
+      value,
     }
   }
 }

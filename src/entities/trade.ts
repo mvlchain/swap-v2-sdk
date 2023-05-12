@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-extra-semi */
 import {
   computePriceImpact,
   Token,
@@ -7,13 +8,13 @@ import {
   Percent,
   Price,
   sortedInsert,
-  TradeType
+  TradeType,
 } from '@uniswap/sdk-core'
-import { ONE, ZERO } from '../constants'
 import invariant from 'tiny-invariant'
 
 import { Pair } from './pair'
 import { Route } from './route'
+import { ONE, ZERO } from '../constants'
 
 // minimal interface so the input output comparator may be shared across types
 interface InputOutput<TInput extends Currency, TOutput extends Currency> {
@@ -205,8 +206,9 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
     if (this.tradeType === TradeType.EXACT_INPUT) {
       return this.inputAmount
     } else {
-      const slippageAdjustedAmountIn = new Fraction(ONE).add(slippageTolerance).multiply(this.inputAmount.quotient)
-        .quotient
+      const slippageAdjustedAmountIn = new Fraction(ONE)
+        .add(slippageTolerance)
+        .multiply(this.inputAmount.quotient).quotient
       return CurrencyAmount.fromRawAmount(this.inputAmount.currency, slippageAdjustedAmountIn)
     }
   }
@@ -252,6 +254,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
         ;[amountOut] = pair.getOutputAmount(amountIn)
       } catch (error) {
         // input too low
+        // @ts-ignore
         if (error.isInsufficientInputAmountError) {
           continue
         }
@@ -279,7 +282,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
           currencyOut,
           {
             maxNumResults,
-            maxHops: maxHops - 1
+            maxHops: maxHops - 1,
           },
           [...currentPairs, pair],
           amountOut,
@@ -346,6 +349,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
         ;[amountIn] = pair.getInputAmount(amountOut)
       } catch (error) {
         // not enough liquidity in this pair
+        // @ts-ignore
         if (error.isInsufficientReservesError) {
           continue
         }
@@ -373,7 +377,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
           currencyAmountOut,
           {
             maxNumResults,
-            maxHops: maxHops - 1
+            maxHops: maxHops - 1,
           },
           [pair, ...currentPairs],
           amountIn,

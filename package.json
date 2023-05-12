@@ -3,30 +3,25 @@
   "license": "MIT",
   "version": "3.0.1",
   "description": "🛠 An SDK for building applications on top of Uniswap V2",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "repository": "https://github.com/Uniswap/uniswap-v2-sdk.git",
-  "keywords": [
-    "uniswap",
-    "ethereum"
-  ],
-  "module": "dist/v2-sdk.esm.js",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
-    "lint": "tsdx lint src test",
-    "build": "tsdx build",
-    "start": "tsdx watch",
-    "test": "tsdx test",
-    "prepublishOnly": "tsdx build"
+    "lint": "tsc lint src test",
+    "build": "tsc",
+    "start": "tsc watch",
+    "test": "tsc test",
+    "prepublishOnly": "tsc build"
+  },
+  "peerDependencies": {
+    "@uniswap/sdk-core": "*",
+    "jsbi": "*"
   },
   "dependencies": {
     "@ethersproject/address": "^5.0.0",
     "@ethersproject/solidity": "^5.0.0",
-    "@uniswap/sdk-core": "^3.0.0-alpha.3",
     "tiny-invariant": "^1.1.0",
-    "tiny-warning": "^1.0.3"
+    "tiny-warning": "^1.0.3",
+    "tsconfig": "workspace:*"
   },
   "devDependencies": {
     "@types/big.js": "^4.0.5",
@@ -34,12 +29,7 @@
     "@uniswap/v2-core": "^1.0.1",
     "tsdx": "^0.14.1"
   },
-  "engines": {
-    "node": ">=10"
-  },
-  "prettier": {
-    "printWidth": 120,
-    "semi": false,
-    "singleQuote": true
+  "installConfig": {
+    "hoistingLimits": "none"
   }
 }

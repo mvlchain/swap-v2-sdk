@@ -1,8 +1,9 @@
+import { Ether, CurrencyAmount, Percent, Token, TradeType, WETH9, Price } from '@uniswap/sdk-core'
+import JSBI from 'jsbi'
+
 import { Pair } from './pair'
 import { Route } from './route'
 import { Trade } from './trade'
-import JSBI from 'jsbi'
-import { Ether, CurrencyAmount, Percent, Token, TradeType, WETH9, Price } from '@uniswap/sdk-core'
 
 describe('Trade', () => {
   const ETHER = Ether.onChain(1)
@@ -89,7 +90,7 @@ describe('Trade', () => {
     it('throws with max hops of 0', () => {
       expect(() =>
         Trade.bestTradeExactIn([pair_0_2], CurrencyAmount.fromRawAmount(token0, JSBI.BigInt(100)), token2, {
-          maxHops: 0
+          maxHops: 0,
         })
       ).toThrow('MAX_HOPS')
     })
@@ -352,7 +353,7 @@ describe('Trade', () => {
     it('throws with max hops of 0', () => {
       expect(() =>
         Trade.bestTradeExactOut([pair_0_2], token0, CurrencyAmount.fromRawAmount(token2, JSBI.BigInt(100)), {
-          maxHops: 0
+          maxHops: 0,
         })
       ).toThrow('MAX_HOPS')
     })
