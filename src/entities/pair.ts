@@ -116,7 +116,10 @@ export class Pair {
     return token.equals(this.token0) ? this.reserve0 : this.reserve1;
   }
 
-  public getOutputAmount(inputAmount: CurrencyAmount<Token>): [CurrencyAmount<Token>, Pair] {
+  public getOutputAmount(
+    inputAmount: CurrencyAmount<Token>,
+    feeValue: JSBI = _997
+  ): [CurrencyAmount<Token>, Pair] {
     invariant(this.involvesToken(inputAmount.currency), 'TOKEN');
     if (JSBI.equal(this.reserve0.quotient, ZERO) || JSBI.equal(this.reserve1.quotient, ZERO)) {
       throw new InsufficientReservesError();
@@ -125,7 +128,7 @@ export class Pair {
     const outputReserve = this.reserveOf(
       inputAmount.currency.equals(this.token0) ? this.token1 : this.token0
     );
-    const inputAmountWithFee = JSBI.multiply(inputAmount.quotient, _997);
+    const inputAmountWithFee = JSBI.multiply(inputAmount.quotient, feeValue);
     const numerator = JSBI.multiply(inputAmountWithFee, outputReserve.quotient);
     const denominator = JSBI.add(JSBI.multiply(inputReserve.quotient, _1000), inputAmountWithFee);
     const outputAmount = CurrencyAmount.fromRawAmount(
@@ -141,7 +144,10 @@ export class Pair {
     ];
   }
 
-  public getInputAmount(outputAmount: CurrencyAmount<Token>): [CurrencyAmount<Token>, Pair] {
+  public getInputAmount(
+    outputAmount: CurrencyAmount<Token>,
+    feeValue: JSBI = _997
+  ): [CurrencyAmount<Token>, Pair] {
     invariant(this.involvesToken(outputAmount.currency), 'TOKEN');
     if (
       JSBI.equal(this.reserve0.quotient, ZERO) ||
@@ -161,7 +167,7 @@ export class Pair {
     );
     const denominator = JSBI.multiply(
       JSBI.subtract(outputReserve.quotient, outputAmount.quotient),
-      _997
+      feeValue
     );
     const inputAmount = CurrencyAmount.fromRawAmount(
       outputAmount.currency.equals(this.token0) ? this.token1 : this.token0,
