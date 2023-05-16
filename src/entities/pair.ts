@@ -181,7 +181,8 @@ export class Pair {
    */
   public getOutputAmount(
     inputAmount: CurrencyAmount<Token>,
-    calculateFotFees: boolean = true
+    calculateFotFees: boolean = true,
+    feeValue: JSBI = _997
   ): [CurrencyAmount<Token>, Pair] {
     invariant(this.involvesToken(inputAmount.currency), 'TOKEN')
     if (JSBI.equal(this.reserve0.quotient, ZERO) || JSBI.equal(this.reserve1.quotient, ZERO)) {
@@ -198,7 +199,7 @@ export class Pair {
         )
       : inputAmount
 
-    const inputAmountWithFeeAndAfterTax = JSBI.multiply(inputAmountAfterTax.quotient, _997)
+    const inputAmountWithFeeAndAfterTax = JSBI.multiply(inputAmountAfterTax.quotient, feeValue)
     const numerator = JSBI.multiply(inputAmountWithFeeAndAfterTax, outputReserve.quotient)
     const denominator = JSBI.add(JSBI.multiply(inputReserve.quotient, _1000), inputAmountWithFeeAndAfterTax)
     const outputAmount = CurrencyAmount.fromRawAmount(
@@ -271,7 +272,8 @@ export class Pair {
    */
   public getInputAmount(
     outputAmount: CurrencyAmount<Token>,
-    calculateFotFees: boolean = true
+    calculateFotFees: boolean = true,
+    feeValue: JSBI = _997
   ): [CurrencyAmount<Token>, Pair] {
     invariant(this.involvesToken(outputAmount.currency), 'TOKEN')
     const percentAfterBuyFees = calculateFotFees ? this.derivePercentAfterBuyFees(outputAmount) : ZERO_PERCENT
@@ -295,7 +297,7 @@ export class Pair {
     const inputReserve = this.reserveOf(outputAmount.currency.equals(this.token0) ? this.token1 : this.token0)
 
     const numerator = JSBI.multiply(JSBI.multiply(inputReserve.quotient, outputAmountBeforeTax.quotient), _1000)
-    const denominator = JSBI.multiply(JSBI.subtract(outputReserve.quotient, outputAmountBeforeTax.quotient), _997)
+    const denominator = JSBI.multiply(JSBI.subtract(outputReserve.quotient, outputAmountBeforeTax.quotient), feeValue)
     const inputAmount = CurrencyAmount.fromRawAmount(
       outputAmount.currency.equals(this.token0) ? this.token1 : this.token0,
       JSBI.add(JSBI.divide(numerator, denominator), ONE) // add 1 here is part of the formula, no rounding needed here, since there will not be decimal at this point
