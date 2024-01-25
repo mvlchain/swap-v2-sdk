@@ -1,3 +1,12 @@
 {
-  "plugins": [] // "transform-jsbi-to-bigint"
+  "plugins": [
+    ["transform-imports",
+      {
+        "@uniswap/sdk-core": {
+          "transform": "@mvlchain/swap-sdk-core",
+          "skipDefaultConversion": true
+        }
+      }
+    ]
+  ]
 }

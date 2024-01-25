@@ -20,7 +20,9 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "paths": {
-      "*": ["src/*", "node_modules/*"]
+      "*": ["src/*", "node_modules/*"],
+      "@uniswap/sdk-core": ["node_modules/@mvlchain/swap-sdk-core"],
+      "@uniswap/sdk-core/*": ["node_modules/@mvlchain/swap-sdk-core/*"]
     },
     "esModuleInterop": true,
     "resolveJsonModule": true
