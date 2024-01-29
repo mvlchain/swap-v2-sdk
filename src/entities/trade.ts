@@ -9,8 +9,9 @@ import {
   sortedInsert,
   TradeType
 } from '@uniswap/sdk-core'
-import { ONE, ZERO } from '../constants'
+import { _997, ONE, ZERO } from '../constants'
 import invariant from 'tiny-invariant'
+import JSBI from 'jsbi'
 
 import { Pair } from './pair'
 import { Route } from './route'
@@ -135,7 +136,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
   public constructor(
     route: Route<TInput, TOutput>,
     amount: TTradeType extends TradeType.EXACT_INPUT ? CurrencyAmount<TInput> : CurrencyAmount<TOutput>,
-    tradeType: TTradeType
+    tradeType: TTradeType,
+    feeValue: JSBI = _997
   ) {
     this.route = route
     this.tradeType = tradeType
@@ -146,7 +148,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
       tokenAmounts[0] = amount.wrapped
       for (let i = 0; i < route.path.length - 1; i++) {
         const pair = route.pairs[i]
-        const [outputAmount] = pair.getOutputAmount(tokenAmounts[i])
+        const [outputAmount] = pair.getOutputAmount(tokenAmounts[i], undefined, feeValue)
         tokenAmounts[i + 1] = outputAmount
       }
       this.inputAmount = CurrencyAmount.fromFractionalAmount(route.input, amount.numerator, amount.denominator)
@@ -160,7 +162,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
       tokenAmounts[tokenAmounts.length - 1] = amount.wrapped
       for (let i = route.path.length - 1; i > 0; i--) {
         const pair = route.pairs[i - 1]
-        const [inputAmount] = pair.getInputAmount(tokenAmounts[i])
+        const [inputAmount] = pair.getInputAmount(tokenAmounts[i], undefined, feeValue)
         tokenAmounts[i - 1] = inputAmount
       }
       this.inputAmount = CurrencyAmount.fromFractionalAmount(
@@ -208,6 +210,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
       const slippageAdjustedAmountIn = new Fraction(ONE).add(slippageTolerance).multiply(this.inputAmount.quotient)
         .quotient
       return CurrencyAmount.fromRawAmount(this.inputAmount.currency, slippageAdjustedAmountIn)
+
     }
   }
 
@@ -224,6 +227,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
    * @param currentPairs used in recursion; the current list of pairs
    * @param currencyAmountIn used in recursion; the original value of the currencyAmountIn parameter
    * @param bestTrades used in recursion; the current list of best trades
+   * @param feeValue customize default fee value
    */
   public static bestTradeExactIn<TInput extends Currency, TOutput extends Currency>(
     pairs: Pair[],
@@ -233,7 +237,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
     // used in recursion.
     currentPairs: Pair[] = [],
     nextAmountIn: CurrencyAmount<Currency> = currencyAmountIn,
-    bestTrades: Trade<TInput, TOutput, TradeType.EXACT_INPUT>[] = []
+    bestTrades: Trade<TInput, TOutput, TradeType.EXACT_INPUT>[] = [],
+    feeValue: JSBI = _997
   ): Trade<TInput, TOutput, TradeType.EXACT_INPUT>[] {
     invariant(pairs.length > 0, 'PAIRS')
     invariant(maxHops > 0, 'MAX_HOPS')
@@ -249,7 +254,7 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
 
       let amountOut: CurrencyAmount<Token>
       try {
-        ;[amountOut] = pair.getOutputAmount(amountIn)
+        ;[amountOut] = pair.getOutputAmount(amountIn, undefined, feeValue)
       } catch (error) {
         // input too low
         if (error.isInsufficientInputAmountError) {
@@ -283,7 +288,8 @@ export class Trade<TInput extends Currency, TOutput extends Currency, TTradeType
           },
           [...currentPairs, pair],
           amountOut,
-          bestTrades
+          bestTrades,
+          feeValue
         )
       }
     }
